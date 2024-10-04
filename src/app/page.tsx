@@ -4,9 +4,10 @@ import { useState, useEffect, useRef } from 'react'
 import { Card, CardContent } from "@/components/ui/card"
 import { motion, AnimatePresence } from "framer-motion"
 import useEmblaCarousel from 'embla-carousel-react'
-import { Clock3 } from 'lucide-react';
+import { Clock3 } from 'lucide-react'
+import Image from 'next/image' // Importar Image de Next.js
 
-// Simulated data for turns
+// Datos simulados para turnos
 const turnsData = [
   { name: "Juan Pérez", module: "Módulo 3" },
   { name: "Kenia Flores Osuna", module: "Módulo 3" },
@@ -16,7 +17,7 @@ const turnsData = [
   { name: "Jhonatan David Camelo", module: "Módulo 1" },
 ]
 
-// Clock component
+// Componente de Reloj
 const Clock = () => {
   const [time, setTime] = useState(new Date())
 
@@ -27,15 +28,15 @@ const Clock = () => {
 
   return (
     <div className="flex justify-center items-center text-2xl font-bold text-center p-3 bg-white/30 dark:bg-gray-800/30 backdrop-blur-sm rounded-xl shadow-lg text-gray-800 dark:text-gray-200">
-    <Clock3 className="w-7 h-7 mr-2 text-indigo-600 dark:text-indigo-400" />
-    <span className="">
-      {time.toLocaleTimeString()}
-    </span>
-  </div>
+      <Clock3 className="w-7 h-7 mr-2 text-indigo-600 dark:text-indigo-400" />
+      <span>
+        {time.toLocaleTimeString()}
+      </span>
+    </div>
   )
 }
 
-// Custom Carousel component
+// Componente de Carrusel Personalizado
 const AutoPlayCarousel = () => {
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true })
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -63,16 +64,19 @@ const AutoPlayCarousel = () => {
         } else {
           setTimeout(() => {
             emblaApi.scrollNext()
-          }, 5000) // Change slide every 5 seconds for images
+          }, 5000) // Cambia de slide cada 5 segundos para imágenes
         }
       }
     }
 
     autoPlay()
 
+    // Copiar videoRef.current a una variable local
+    const videoElement = videoRef.current
+
     return () => {
-      if (videoRef.current) {
-        videoRef.current.pause()
+      if (videoElement) {
+        videoElement.pause()
       }
     }
   }, [emblaApi, currentIndex])
@@ -85,14 +89,25 @@ const AutoPlayCarousel = () => {
 
   return (
     <div className="w-full flex-grow rounded-xl overflow-hidden shadow-2xl mb-4" ref={emblaRef}>
-      <div className="flex">
-        <div className="flex-[0_0_100%] min-w-0">
-          <img src="images/prom.png" alt="Anuncio 1" className="w-full h-full object-cover" />
+      <div className="flex h-full">
+        <div className="flex-[0_0_100%] min-w-0 relative h-full">
+          <Image 
+            src="/images/prom.png" 
+            alt="Anuncio 1" 
+            layout="fill" 
+            objectFit="cover"
+            priority
+          />
         </div>
-        <div className="flex-[0_0_100%] min-w-0">
-          <img src="images/prom2.png" alt="Anuncio 2" className="w-full h-full object-cover" />
+        <div className="flex-[0_0_100%] min-w-0 relative h-full">
+          <Image 
+            src="/images/prom2.png" 
+            alt="Anuncio 2" 
+            layout="fill" 
+            objectFit="cover"
+          />
         </div>
-        <div className="flex-[0_0_100%] min-w-0">
+        <div className="flex-[0_0_100%] min-w-0 relative h-full">
           <video 
             ref={videoRef}
             className="w-full h-full object-cover" 
@@ -149,7 +164,7 @@ const DotAnimation = ({ text }: { text: string }) => {
 export default function Component() {
   const [turns, setTurns] = useState(turnsData)
   const [currentTurn, setCurrentTurn] = useState(turns[0])
-  const [isNewTurn, setIsNewTurn] = useState(false)
+  // Eliminada la declaración de isNewTurn
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
   useEffect(() => {
@@ -170,11 +185,10 @@ export default function Component() {
         const [first, ...rest] = prevTurns
         return [...rest, first]
       })
-      setIsNewTurn(true)
+      // Eliminadas las líneas relacionadas con isNewTurn
       if (audioRef.current) {
         audioRef.current.play().catch(error => console.error("Error playing audio:", error))
       }
-      setTimeout(() => setIsNewTurn(false), 2000)
     }, 8000)
 
     return () => clearInterval(interval)
@@ -194,7 +208,9 @@ export default function Component() {
       <div className="w-full lg:w-1/2 p-6 flex flex-col">
         <Card className="flex-grow bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-xl rounded-xl overflow-hidden">
           <CardContent className="p-8">
-            <h2 className="text-4xl font-bold mb-6 text-center bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-600 dark:from-purple-400 dark:to-indigo-400">Turno Actual</h2>
+            <h2 className="text-4xl font-bold mb-6 text-center bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-600 dark:from-purple-400 dark:to-indigo-400">
+              Turno Actual
+            </h2>
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentTurn.name}
